@@ -1,6 +1,6 @@
 """
-Dataset Evaluator for Temporal Style Evolution Tracker
-Evaluates the system's performance using the Human vs LLM Text Corpus dataset
+Testing Dataset Evaluator for Style Tracker
+Evaluates the style evolution tracker's performance using the Human vs LLM Text Corpus dataset
 from Kaggle: https://www.kaggle.com/datasets/starblasters8/human-vs-llm-text-corpus
 Uses kagglehub library for dataset download
 """
@@ -11,7 +11,6 @@ import pandas as pd
 from typing import Dict, List, Tuple, Optional
 from pathlib import Path
 from datetime import datetime
-
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -22,17 +21,13 @@ try:
 except ImportError:
     kagglehub = None
     console = Console()
-    console.print("[yellow]Warning: kagglehub not installed. Install with: pip install kagglehub[/yellow]")
-
-# Import temporal tracker
+    console.print("Please install kagglehub to use this dataset evaluator.")
 from temporal_tracker import TemporalTracker
 
 console = Console()
 
 
 class DatasetEvaluator:
-    """Evaluates the Temporal Tracker using the Human vs LLM Text Corpus dataset."""
-    
     def __init__(self, tracker: TemporalTracker):
         self.tracker = tracker
         self.results: List[Dict] = []
@@ -97,8 +92,50 @@ class DatasetEvaluator:
                 if csv_file is None:
                     raise FileNotFoundError(f"No CSV files found in {dataset_path} or subdirectories")
         
-        # Load CSV
-        df = pd.read_csv(csv_file)
+        # Load CSV with robust parsing for large files with complex text
+        # Try multiple parsing strategies to handle different CSV formats
+        try:
+            # Try with pandas 2.0+ syntax first (Python engine doesn't support low_memory)
+            df = pd.read_csv(
+                csv_file,
+                quoting=1,  # QUOTE_ALL - handle quoted fields properly
+                on_bad_lines='skip',  # Skip problematic lines instead of crashing
+                engine='python'  # Use Python engine for better error handling
+            )
+        except TypeError:
+            # pandas < 2.0 uses different parameter name
+            try:
+                df = pd.read_csv(
+                    csv_file,
+                    quoting=1,
+                    error_bad_lines=False,  # Old pandas syntax
+                    warn_bad_lines=False,
+                    engine='python'
+                )
+            except Exception as e:
+                console.print(f"[yellow]Trying basic read: {e}[/yellow]")
+                # Final fallback: basic read with chunking for large files
+                try:
+                    # Read in chunks and concatenate
+                    chunk_list = []
+                    chunk_size = 100000
+                    for chunk in pd.read_csv(csv_file, chunksize=chunk_size, engine='python', on_bad_lines='skip'):
+                        chunk_list.append(chunk)
+                    df = pd.concat(chunk_list, ignore_index=True)
+                except:
+                    # Ultimate fallback - basic read
+                    df = pd.read_csv(csv_file, engine='python')
+        except Exception as e:
+            console.print(f"[yellow]Trying alternative parsing: {e}[/yellow]")
+            # Alternative: try with chunking
+            try:
+                chunk_list = []
+                for chunk in pd.read_csv(csv_file, chunksize=100000, on_bad_lines='skip'):
+                    chunk_list.append(chunk)
+                df = pd.concat(chunk_list, ignore_index=True)
+            except:
+                # Last resort
+                df = pd.read_csv(csv_file, engine='python')
         
         console.print(f"[green]✓ Loaded {len(df)} rows from {csv_file.name}[/green]")
         console.print(f"Columns: {list(df.columns)}")

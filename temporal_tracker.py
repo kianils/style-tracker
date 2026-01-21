@@ -31,8 +31,13 @@ load_dotenv()
 
 try:
     from openai import OpenAI
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    api_key = os.getenv("OPENAI_API_KEY")
+    client = OpenAI(api_key=api_key) if api_key else None
 except ImportError:
+    client = None
+except Exception as e:
+    # Handle any OpenAI initialization errors gracefully
+    console.print(f"[yellow]Warning: OpenAI client not available: {e}[/yellow]")
     client = None
 
 console = Console()
