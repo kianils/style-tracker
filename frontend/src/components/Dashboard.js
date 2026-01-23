@@ -11,10 +11,10 @@ function Dashboard({ documents, onRefresh }) {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
       >
-        <h1 className="text-6xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <h1 className="text-6xl font-bold text-white dark:text-slate-100 mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
           Temporal Style Tracker
         </h1>
-        <p className="text-gray-300 text-xl">
+        <p className="text-gray-300 dark:text-slate-300 text-xl">
           Track writing style evolution over time with AI-powered authenticity analysis
         </p>
       </motion.div>
@@ -27,8 +27,8 @@ function Dashboard({ documents, onRefresh }) {
           className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 backdrop-blur-lg rounded-xl p-6 border border-purple-500/30"
         >
           <FileText className="w-8 h-8 text-purple-400 mb-3" />
-          <div className="text-3xl font-bold text-white mb-1">{documents.length}</div>
-          <div className="text-gray-300">Documents Tracked</div>
+          <div className="text-3xl font-bold text-white dark:text-slate-100 mb-1">{documents.length}</div>
+          <div className="text-gray-300 dark:text-slate-300">Documents Tracked</div>
         </motion.div>
 
         <motion.div
@@ -39,10 +39,10 @@ function Dashboard({ documents, onRefresh }) {
           className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 backdrop-blur-lg rounded-xl p-6 border border-blue-500/30"
         >
           <TrendingUp className="w-8 h-8 text-blue-400 mb-3" />
-          <div className="text-3xl font-bold text-white mb-1">
+          <div className="text-3xl font-bold text-white dark:text-slate-100 mb-1">
             {documents.reduce((sum, doc) => sum + (doc.version_count || 0), 0)}
           </div>
-          <div className="text-gray-300">Total Versions</div>
+          <div className="text-gray-300 dark:text-slate-300">Total Versions</div>
         </motion.div>
 
         <motion.div
@@ -53,8 +53,8 @@ function Dashboard({ documents, onRefresh }) {
           className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 backdrop-blur-lg rounded-xl p-6 border border-green-500/30"
         >
           <Clock className="w-8 h-8 text-green-400 mb-3" />
-          <div className="text-3xl font-bold text-white mb-1">Real-time</div>
-          <div className="text-gray-300">Style Analysis</div>
+          <div className="text-3xl font-bold text-white dark:text-slate-100 mb-1">Real-time</div>
+          <div className="text-gray-300 dark:text-slate-300">Style Analysis</div>
         </motion.div>
       </div>
 
@@ -63,15 +63,15 @@ function Dashboard({ documents, onRefresh }) {
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="bg-white/10 backdrop-blur-lg rounded-xl p-8 border border-white/20 hover:border-purple-500/50 transition-all cursor-pointer"
+            className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl p-8 border border-white/20 dark:border-slate-700 hover:border-purple-500/50 transition-all cursor-pointer"
           >
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
                 <Plus className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">Analyze Text</h2>
-                <p className="text-gray-400">Check authenticity of any text</p>
+                <h2 className="text-2xl font-bold text-white dark:text-slate-100">Analyze Text</h2>
+                <p className="text-gray-400 dark:text-slate-400">Check authenticity of any text</p>
               </div>
             </div>
             <div className="flex items-center text-purple-400">
@@ -82,17 +82,17 @@ function Dashboard({ documents, onRefresh }) {
 
         <motion.div
           whileHover={{ scale: 1.02 }}
-          className="bg-white/10 backdrop-blur-lg rounded-xl p-8 border border-white/20"
+          className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl p-8 border border-white/20 dark:border-slate-700"
         >
-          <h2 className="text-2xl font-bold text-white mb-4">Quick Stats</h2>
+          <h2 className="text-2xl font-bold text-white dark:text-slate-100 mb-4">Quick Stats</h2>
           <div className="space-y-3">
-            <div className="flex justify-between text-gray-300">
+            <div className="flex justify-between text-gray-300 dark:text-slate-300">
               <span>Active Documents</span>
-              <span className="text-white font-semibold">{documents.length}</span>
+              <span className="text-white dark:text-slate-100 font-semibold">{documents.length}</span>
             </div>
-            <div className="flex justify-between text-gray-300">
+            <div className="flex justify-between text-gray-300 dark:text-slate-300">
               <span>Average Versions</span>
-              <span className="text-white font-semibold">
+              <span className="text-white dark:text-slate-100 font-semibold">
                 {documents.length > 0
                   ? (documents.reduce((sum, doc) => sum + (doc.version_count || 0), 0) / documents.length).toFixed(1)
                   : 0}
@@ -103,15 +103,15 @@ function Dashboard({ documents, onRefresh }) {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-white mb-6">Your Documents</h2>
+        <h2 className="text-2xl font-bold text-white dark:text-slate-100 mb-6">Your Documents</h2>
         {documents.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white/5 backdrop-blur-lg rounded-xl p-12 border border-white/10 text-center"
+            className="bg-white/5 dark:bg-slate-800/30 backdrop-blur-lg rounded-xl p-12 border border-white/10 dark:border-slate-700 text-center"
           >
-            <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg mb-4">No documents tracked yet</p>
+            <FileText className="w-16 h-16 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+            <p className="text-gray-400 dark:text-slate-400 text-lg mb-4">No documents tracked yet</p>
             <Link to="/analyze">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -131,7 +131,7 @@ function Dashboard({ documents, onRefresh }) {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.1 }}
                   whileHover={{ scale: 1.02, y: -5 }}
-                  className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20 hover:border-purple-500/50 transition-all cursor-pointer"
+                  className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-lg rounded-xl p-6 border border-white/20 dark:border-slate-700 hover:border-purple-500/50 transition-all cursor-pointer"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <FileText className="w-8 h-8 text-purple-400" />
@@ -139,9 +139,9 @@ function Dashboard({ documents, onRefresh }) {
                       {doc.version_count} versions
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">{doc.document_id}</h3>
+                  <h3 className="text-xl font-bold text-white dark:text-slate-100 mb-2">{doc.document_id}</h3>
                   {doc.updated_at && (
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-400 dark:text-slate-400 text-sm">
                       Updated {new Date(doc.updated_at).toLocaleDateString()}
                     </p>
                   )}

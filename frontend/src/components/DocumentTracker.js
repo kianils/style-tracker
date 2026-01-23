@@ -62,7 +62,7 @@ function DocumentTracker({ onUpdate }) {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center text-white">Loading...</div>
+        <div className="text-center text-white dark:text-slate-100">Loading...</div>
       </div>
     );
   }
@@ -81,7 +81,7 @@ function DocumentTracker({ onUpdate }) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <Link to="/" className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-6">
+      <Link to="/" className="inline-flex items-center gap-2 text-white/70 dark:text-slate-300 hover:text-white dark:hover:text-slate-100 mb-6">
         <ArrowLeft className="w-5 h-5" />
         Back to Dashboard
       </Link>
@@ -89,12 +89,12 @@ function DocumentTracker({ onUpdate }) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20"
+        className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-slate-700"
       >
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">{documentId}</h1>
-            <p className="text-gray-300">{versions.length} versions tracked</p>
+            <h1 className="text-4xl font-bold text-white dark:text-slate-100 mb-2">{documentId}</h1>
+            <p className="text-gray-300 dark:text-slate-300">{versions.length} versions tracked</p>
           </div>
           {drift?.drift_detected && (
             <motion.div
@@ -109,8 +109,8 @@ function DocumentTracker({ onUpdate }) {
         </div>
 
         {/* Add New Version */}
-        <div className="mb-8 bg-slate-800/50 rounded-lg p-6 border border-slate-700">
-          <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+        <div className="mb-8 bg-slate-800/50 dark:bg-slate-900/50 rounded-lg p-6 border border-slate-700 dark:border-slate-600">
+          <h2 className="text-xl font-semibold text-white dark:text-slate-100 mb-4 flex items-center gap-2">
             <Plus className="w-5 h-5" />
             Add New Version
           </h2>
@@ -118,7 +118,7 @@ function DocumentTracker({ onUpdate }) {
             value={newText}
             onChange={(e) => setNewText(e.target.value)}
             placeholder="Enter new version of the text..."
-            className="w-full h-32 px-4 py-3 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3 resize-none"
+            className="w-full h-32 px-4 py-3 bg-slate-700/50 dark:bg-slate-800/50 border border-slate-600 dark:border-slate-700 rounded-lg text-white dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 mb-3 resize-none"
           />
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -137,9 +137,9 @@ function DocumentTracker({ onUpdate }) {
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-slate-800/50 rounded-lg p-6 border border-slate-700"
+              className="bg-slate-800/50 dark:bg-slate-900/50 rounded-lg p-6 border border-slate-700 dark:border-slate-600"
             >
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+              <h3 className="text-lg font-semibold text-white dark:text-slate-100 mb-4 flex items-center gap-2">
                 <TrendingUp className="w-5 h-5" />
                 Authenticity Evolution
               </h3>
@@ -167,9 +167,9 @@ function DocumentTracker({ onUpdate }) {
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              className="bg-slate-800/50 rounded-lg p-6 border border-slate-700"
+              className="bg-slate-800/50 dark:bg-slate-900/50 rounded-lg p-6 border border-slate-700 dark:border-slate-600"
             >
-              <h3 className="text-lg font-semibold text-white mb-4">Style Features</h3>
+              <h3 className="text-lg font-semibold text-white dark:text-slate-100 mb-4">Style Features</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={featureData.slice(0, 6)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -189,20 +189,20 @@ function DocumentTracker({ onUpdate }) {
         {analysis && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg p-4">
-              <div className="text-sm text-gray-300 mb-1">Trend</div>
-              <div className="text-2xl font-bold text-white capitalize">
+              <div className="text-sm text-gray-300 dark:text-slate-300 mb-1">Trend</div>
+              <div className="text-2xl font-bold text-white dark:text-slate-100 capitalize">
                 {analysis.authenticity_trend?.direction || 'stable'}
               </div>
             </div>
             <div className="bg-blue-600/20 border border-blue-500/30 rounded-lg p-4">
-              <div className="text-sm text-gray-300 mb-1">Time Span</div>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-sm text-gray-300 dark:text-slate-300 mb-1">Time Span</div>
+              <div className="text-2xl font-bold text-white dark:text-slate-100">
                 {analysis.time_span?.duration_days || 0} days
               </div>
             </div>
             <div className="bg-orange-600/20 border border-orange-500/30 rounded-lg p-4">
-              <div className="text-sm text-gray-300 mb-1">Drift Score</div>
-              <div className="text-2xl font-bold text-white">
+              <div className="text-sm text-gray-300 dark:text-slate-300 mb-1">Drift Score</div>
+              <div className="text-2xl font-bold text-white dark:text-slate-100">
                 {drift?.drift_score ? drift.drift_score.toFixed(3) : '0.000'}
               </div>
             </div>
@@ -211,7 +211,7 @@ function DocumentTracker({ onUpdate }) {
 
         {/* Versions List */}
         <div>
-          <h3 className="text-xl font-semibold text-white mb-4">Version History</h3>
+          <h3 className="text-xl font-semibold text-white dark:text-slate-100 mb-4">Version History</h3>
           <div className="space-y-4">
             {versions.map((version, idx) => (
               <motion.div
@@ -219,12 +219,12 @@ function DocumentTracker({ onUpdate }) {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-purple-500/50 transition-colors"
+                className="bg-slate-800/50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-700 dark:border-slate-600 hover:border-purple-500/50 transition-colors"
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     <span className="text-purple-400 font-bold">{version.version_id}</span>
-                    <span className="text-gray-400 text-sm">
+                    <span className="text-gray-400 dark:text-slate-400 text-sm">
                       {new Date(version.timestamp).toLocaleString()}
                     </span>
                   </div>
@@ -236,7 +236,7 @@ function DocumentTracker({ onUpdate }) {
                     {(version.authenticity_score * 100).toFixed(1)}%
                   </div>
                 </div>
-                <p className="text-gray-300 text-sm line-clamp-2">
+                <p className="text-gray-300 dark:text-slate-300 text-sm line-clamp-2">
                   {version.text.substring(0, 200)}...
                 </p>
               </motion.div>
