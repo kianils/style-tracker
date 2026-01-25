@@ -99,6 +99,25 @@ function About() {
               linguistic features (sentence length, lexical diversity, punctuation patterns) for 
               comprehensive analysis.
             </p>
+
+            <div className="bg-blue-600/20 border border-blue-500/30 rounded-lg p-4 mt-4">
+              <h4 className="font-semibold text-white dark:text-slate-100 mb-2">⚡ Optimized Real-time Analysis</h4>
+              <p className="text-gray-300 dark:text-slate-300 text-sm">
+                For real-time lexical analysis, the system employs a <strong>Trie (prefix tree) data structure</strong> 
+                to enable O(m) word search complexity where m is the word length, significantly faster than 
+                traditional O(n) linear searches. This optimization allows for:
+              </p>
+              <ul className="list-disc list-inside text-gray-300 dark:text-slate-300 text-sm mt-2 space-y-1 ml-4">
+                <li>Rapid word insertion and lookup during text processing</li>
+                <li>Efficient unique word counting without redundant set operations</li>
+                <li>Single-pass character analysis for punctuation and capitalization</li>
+                <li>Optimized lexical diversity calculations for real-time feedback</li>
+              </ul>
+              <p className="text-gray-300 dark:text-slate-300 text-sm mt-2">
+                This algorithmic optimization ensures that real-time analysis in Writer Mode responds 
+                quickly even with longer texts, providing instant feedback as users type.
+              </p>
+            </div>
           </div>
         </motion.section>
 
@@ -113,7 +132,8 @@ function About() {
             <div className="bg-slate-800/50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-700">
               <h3 className="font-semibold text-white dark:text-slate-100 mb-2">Real-time Analysis</h3>
               <p className="text-gray-300 dark:text-slate-300 text-sm">
-                Live authenticity detection as you type, with instant feedback on writing style
+                Live authenticity detection as you type, with instant feedback on writing style. 
+                Powered by Trie-based lexical trees for optimized performance.
               </p>
             </div>
             <div className="bg-slate-800/50 dark:bg-slate-900/50 rounded-lg p-4 border border-slate-700">

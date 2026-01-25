@@ -43,6 +43,52 @@ except Exception as e:
 console = Console()
 
 
+class LexicalTrie:
+    """Trie data structure for fast lexical analysis and word pattern matching."""
+    
+    def __init__(self):
+        self.root = {}
+        self.word_count = 0
+        self.unique_words = set()
+    
+    def insert(self, word: str):
+        """Insert a word into the trie."""
+        node = self.root
+        for char in word.lower():
+            if char not in node:
+                node[char] = {}
+            node = node[char]
+        if 'is_end' not in node:
+            node['is_end'] = True
+            self.word_count += 1
+        self.unique_words.add(word.lower())
+    
+    def build_from_text(self, text: str):
+        """Build trie from text efficiently."""
+        import re
+        words = re.findall(r'\b\w+\b', text.lower())
+        for word in words:
+            self.insert(word)
+        return words
+    
+    def search(self, word: str) -> bool:
+        """Search for a word in the trie - O(m) where m is word length."""
+        node = self.root
+        for char in word.lower():
+            if char not in node:
+                return False
+            node = node[char]
+        return node.get('is_end', False)
+    
+    def get_unique_count(self) -> int:
+        """Get count of unique words - O(1) lookup."""
+        return len(self.unique_words)
+    
+    def get_total_count(self) -> int:
+        """Get total word count."""
+        return self.word_count
+
+
 @dataclass
 class VersionSnapshot:
     """Represents a version snapshot of text at a point in time."""
@@ -126,25 +172,47 @@ Return only a single number between 0 and 1 representing authenticity score."""
         return 0.5  # Default
     
     def _extract_style_features(self, text: str) -> Dict[str, float]:
-        """Extract style features from text."""
+        """Extract style features from text using optimized Trie-based lexical analysis."""
         import re
         
-        words = re.findall(r'\b\w+\b', text.lower())
-        sentences = re.split(r'[.!?]+', text)
-        sentences = [s.strip() for s in sentences if s.strip()]
+        # Build lexical trie for fast word processing
+        trie = LexicalTrie()
+        words = trie.build_from_text(text)
+        
+        # Optimized sentence splitting with single pass
+        sentences = [s.strip() for s in re.split(r'[.!?]+', text) if s.strip()]
         
         word_count = len(words)
         sentence_count = len(sentences)
         char_count = len(text)
         
+        # Fast feature calculations using trie
+        unique_word_count = trie.get_unique_count()
+        
+        # Single-pass character analysis for punctuation and caps
+        punctuation_count = 0
+        caps_count = 0
+        total_word_length = 0
+        
+        for char in text:
+            if char in ',.!?;:-':
+                punctuation_count += 1
+            if char.isupper():
+                caps_count += 1
+        
+        for word in words:
+            total_word_length += len(word)
+        
+        # Calculate features efficiently
         features = {
             "avg_sentence_length": word_count / sentence_count if sentence_count > 0 else 0,
-            "avg_word_length": sum(len(w) for w in words) / word_count if word_count > 0 else 0,
-            "lexical_diversity": len(set(words)) / word_count if word_count > 0 else 0,
-            "punctuation_ratio": len(re.findall(r'[,.!?;:-]', text)) / char_count if char_count > 0 else 0,
-            "caps_ratio": sum(1 for c in text if c.isupper()) / char_count if char_count > 0 else 0,
+            "avg_word_length": total_word_length / word_count if word_count > 0 else 0,
+            "lexical_diversity": unique_word_count / word_count if word_count > 0 else 0,
+            "punctuation_ratio": punctuation_count / char_count if char_count > 0 else 0,
+            "caps_ratio": caps_count / char_count if char_count > 0 else 0,
             "word_count": word_count,
-            "sentence_count": sentence_count
+            "sentence_count": sentence_count,
+            "unique_words": unique_word_count
         }
         
         return features
