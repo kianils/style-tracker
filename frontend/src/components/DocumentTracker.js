@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-import { ArrowLeft, Plus, TrendingUp, AlertCircle, Activity } from 'lucide-react';
+import { ArrowLeft, Plus, TrendingUp, AlertCircle, Activity, Download, RefreshCw, XCircle } from 'lucide-react';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
@@ -15,13 +15,21 @@ function DocumentTracker({ onUpdate }) {
   const [newText, setNewText] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchData();
   }, [documentId]);
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (showRefreshing = false) => {
+    if (showRefreshing) {
+      setRefreshing(true);
+    } else {
+      setLoading(true);
+    }
+    setError(null);
+    
     try {
       const [versionsRes, analysisRes, driftRes] = await Promise.all([
         axios.get(`${API_BASE}/documents/${documentId}/versions`),
@@ -34,9 +42,39 @@ function DocumentTracker({ onUpdate }) {
       setDrift(driftRes.data);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setError(
+        error.response?.data?.error || 
+        error.message || 
+        'Failed to load document data. Please check your connection and try again.'
+      );
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
+  };
+
+  const handleRefresh = () => {
+    fetchData(true);
+  };
+
+  const handleExport = () => {
+    const exportData = {
+      document_id: documentId,
+      exported_at: new Date().toISOString(),
+      versions: versions,
+      analysis: analysis,
+      drift: drift
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${documentId}_export_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const handleAddVersion = async () => {
@@ -53,7 +91,8 @@ function DocumentTracker({ onUpdate }) {
       if (onUpdate) onUpdate();
     } catch (error) {
       console.error('Error adding version:', error);
-      alert('Failed to add version');
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to add version';
+      alert(`Error: ${errorMessage}`);
     } finally {
       setSaving(false);
     }
@@ -62,7 +101,52 @@ function DocumentTracker({ onUpdate }) {
   if (loading) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center text-white dark:text-slate-100">Loading...</div>
+        <div className="flex flex-col items-center justify-center min-h-[400px]">
+          <Activity className="w-12 h-12 text-purple-400 animate-spin mb-4" />
+          <div className="text-white dark:text-slate-100 text-lg">Loading document data...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <Link to="/" className="inline-flex items-center gap-2 text-white/70 dark:text-slate-300 hover:text-white dark:hover:text-slate-100 mb-6">
+          <ArrowLeft className="w-5 h-5" />
+          Back to Dashboard
+        </Link>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-500/20 border border-red-500 rounded-2xl shadow-2xl p-8"
+        >
+          <div className="flex items-center gap-4 mb-4">
+            <XCircle className="w-8 h-8 text-red-400" />
+            <h2 className="text-2xl font-bold text-white dark:text-slate-100">Error Loading Document</h2>
+          </div>
+          <p className="text-white/90 dark:text-slate-200 mb-6">{error}</p>
+          <div className="flex gap-4">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleRefresh}
+              className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 flex items-center gap-2"
+            >
+              <RefreshCw className="w-5 h-5" />
+              Retry
+            </motion.button>
+            <Link to="/">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 bg-slate-600 text-white rounded-lg font-semibold hover:bg-slate-700"
+              >
+                Go to Dashboard
+              </motion.button>
+            </Link>
+          </div>
+        </motion.div>
       </div>
     );
   }
@@ -91,21 +175,43 @@ function DocumentTracker({ onUpdate }) {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white/10 dark:bg-slate-800/50 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-slate-700"
       >
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white dark:text-slate-100 mb-2">{documentId}</h1>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white dark:text-slate-100 mb-2 break-words">{documentId}</h1>
             <p className="text-gray-300 dark:text-slate-300">{versions.length} versions tracked</p>
           </div>
-          {drift?.drift_detected && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="flex items-center gap-2 bg-orange-500/20 border border-orange-500 rounded-lg px-4 py-2"
+          <div className="flex items-center gap-3 flex-wrap">
+            {drift?.drift_detected && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="flex items-center gap-2 bg-orange-500/20 border border-orange-500 rounded-lg px-4 py-2"
+              >
+                <AlertCircle className="w-5 h-5 text-orange-400" />
+                <span className="text-orange-300 font-semibold">Style Drift Detected</span>
+              </motion.div>
+            )}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="p-2 bg-slate-700/50 dark:bg-slate-800/50 hover:bg-slate-600 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
+              title="Refresh data"
             >
-              <AlertCircle className="w-5 h-5 text-orange-400" />
-              <span className="text-orange-300 font-semibold">Style Drift Detected</span>
-            </motion.div>
-          )}
+              <RefreshCw className={`w-5 h-5 text-white dark:text-slate-100 ${refreshing ? 'animate-spin' : ''}`} />
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleExport}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+              title="Export data"
+            >
+              <Download className="w-5 h-5" />
+              Export
+            </motion.button>
+          </div>
         </div>
 
         {/* Add New Version */}

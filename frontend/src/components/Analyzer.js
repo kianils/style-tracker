@@ -35,6 +35,7 @@ function Analyzer({ onAnalyze }) {
         setResult(response.data);
       } catch (error) {
         console.error('Real-time analysis error:', error);
+        // Silently fail for real-time analysis to avoid disrupting writing
       }
     }, 1500); // 1.5 second debounce
 
@@ -56,7 +57,8 @@ function Analyzer({ onAnalyze }) {
       setResult(response.data);
     } catch (error) {
       console.error('Analysis error:', error);
-      setResult({ error: 'Failed to analyze text' });
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to analyze text';
+      setResult({ error: errorMessage });
     } finally {
       setLoading(false);
     }
@@ -80,7 +82,8 @@ function Analyzer({ onAnalyze }) {
       if (onAnalyze) onAnalyze();
     } catch (error) {
       console.error('Save error:', error);
-      alert('Failed to save version');
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to save version';
+      alert(`Error: ${errorMessage}`);
     } finally {
       setSaving(false);
     }
@@ -94,9 +97,9 @@ function Analyzer({ onAnalyze }) {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* Main Content */}
-        <div className="flex-1">
+        <div className="flex-1 order-2 lg:order-1">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -104,8 +107,8 @@ function Analyzer({ onAnalyze }) {
           >
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <Sparkles className="w-8 h-8 text-purple-400" />
-                <h1 className="text-4xl font-bold text-white dark:text-slate-100">
+                <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-purple-400" />
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white dark:text-slate-100">
                   {writerMode ? 'Writer Mode' : 'Text Authenticity Analyzer'}
                 </h1>
               </div>
@@ -275,7 +278,7 @@ function Analyzer({ onAnalyze }) {
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className="w-80 flex-shrink-0"
+          className="w-full lg:w-80 flex-shrink-0 order-1 lg:order-2"
         >
           <div className={`bg-white/10 dark:bg-slate-800/50 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white/20 dark:border-slate-700 sticky top-8`}>
             <h3 className="text-lg font-semibold text-white dark:text-slate-100 mb-4">Tools</h3>

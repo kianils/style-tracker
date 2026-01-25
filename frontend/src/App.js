@@ -8,24 +8,31 @@ import DocumentTracker from './components/DocumentTracker';
 import Dashboard from './components/Dashboard';
 import Navbar from './components/Navbar';
 import About from './components/About';
+import { Activity } from 'lucide-react';
 import './App.css';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 function App() {
   const [documents, setDocuments] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchDocuments();
   }, []);
 
   const fetchDocuments = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await axios.get(`${API_BASE}/documents`);
       setDocuments(response.data.documents || []);
     } catch (error) {
       console.error('Error fetching documents:', error);
+      setError('Failed to load documents. Please check if the backend server is running.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -37,13 +44,38 @@ function App() {
           
           <Routes>
             <Route path="/" element={
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-              >
-                <Dashboard documents={documents} onRefresh={fetchDocuments} />
-              </motion.div>
+              loading ? (
+                <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                  <Activity className="w-12 h-12 text-purple-400 animate-spin mb-4" />
+                  <div className="text-white dark:text-slate-100 text-lg">Loading documents...</div>
+                </div>
+              ) : error ? (
+                <div className="container mx-auto px-4 py-8 max-w-7xl">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-red-500/20 border border-red-500 rounded-2xl shadow-2xl p-8 text-center"
+                  >
+                    <p className="text-white dark:text-slate-100 mb-4">{error}</p>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={fetchDocuments}
+                      className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700"
+                    >
+                      Retry
+                    </motion.button>
+                  </motion.div>
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  <Dashboard documents={documents} onRefresh={fetchDocuments} />
+                </motion.div>
+              )
             } />
             
             <Route path="/analyze" element={

@@ -14,43 +14,46 @@ function Navbar() {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-purple-400" />
-            <span className="text-xl font-bold text-white dark:text-slate-100">Style Tracker</span>
+            <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-purple-400" />
+            <span className="text-lg md:text-xl font-bold text-white dark:text-slate-100">Style Tracker</span>
           </Link>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2 md:gap-4 lg:gap-6">
             <Link
               to="/"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 md:gap-2 px-2 md:px-4 py-2 rounded-lg transition-colors ${
                 isActive('/') 
                   ? 'bg-purple-600 text-white' 
                   : 'text-gray-300 dark:text-slate-300 hover:bg-slate-800 dark:hover:bg-slate-700'
               }`}
+              title="Dashboard"
             >
               <BarChart3 className="w-5 h-5" />
-              Dashboard
+              <span className="hidden sm:inline">Dashboard</span>
             </Link>
             <Link
               to="/analyze"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 md:gap-2 px-2 md:px-4 py-2 rounded-lg transition-colors ${
                 isActive('/analyze') 
                   ? 'bg-purple-600 text-white' 
                   : 'text-gray-300 dark:text-slate-300 hover:bg-slate-800 dark:hover:bg-slate-700'
               }`}
+              title="Analyze"
             >
               <FileText className="w-5 h-5" />
-              Analyze
+              <span className="hidden sm:inline">Analyze</span>
             </Link>
             <Link
               to="/about"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              className={`flex items-center gap-1 md:gap-2 px-2 md:px-4 py-2 rounded-lg transition-colors ${
                 isActive('/about') 
                   ? 'bg-purple-600 text-white' 
                   : 'text-gray-300 dark:text-slate-300 hover:bg-slate-800 dark:hover:bg-slate-700'
               }`}
+              title="About"
             >
               <Info className="w-5 h-5" />
-              About
+              <span className="hidden sm:inline">About</span>
             </Link>
             
             {/* Theme Toggle */}

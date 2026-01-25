@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FileText, TrendingUp, Clock, Plus, ArrowRight } from 'lucide-react';
+import { FileText, TrendingUp, Clock, Plus, ArrowRight, Search, X } from 'lucide-react';
 
 function Dashboard({ documents, onRefresh }) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredDocuments = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return documents;
+    }
+    const query = searchQuery.toLowerCase();
+    return documents.filter(doc => 
+      doc.document_id.toLowerCase().includes(query) ||
+      (doc.latest_version && doc.latest_version.toLowerCase().includes(query))
+    );
+  }, [documents, searchQuery]);
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <motion.div
@@ -11,10 +23,10 @@ function Dashboard({ documents, onRefresh }) {
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-12"
       >
-        <h1 className="text-6xl font-bold text-white dark:text-slate-100 mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white dark:text-slate-100 mb-4 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
           Temporal Style Tracker
         </h1>
-        <p className="text-gray-300 dark:text-slate-300 text-xl">
+        <p className="text-gray-300 dark:text-slate-300 text-base md:text-lg lg:text-xl px-4">
           Track writing style evolution over time with AI-powered authenticity analysis
         </p>
       </motion.div>
@@ -103,7 +115,29 @@ function Dashboard({ documents, onRefresh }) {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-white dark:text-slate-100 mb-6">Your Documents</h2>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-white dark:text-slate-100">Your Documents</h2>
+          {documents.length > 0 && (
+            <div className="relative w-full sm:w-64">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search documents..."
+                className="w-full pl-10 pr-10 py-2 bg-slate-800/50 dark:bg-slate-900/50 border border-slate-700 dark:border-slate-600 rounded-lg text-white dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-slate-400 hover:text-white dark:hover:text-slate-100"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+          )}
+        </div>
         {documents.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -122,9 +156,24 @@ function Dashboard({ documents, onRefresh }) {
               </motion.button>
             </Link>
           </motion.div>
+        ) : filteredDocuments.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-white/5 dark:bg-slate-800/30 backdrop-blur-lg rounded-xl p-12 border border-white/10 dark:border-slate-700 text-center"
+          >
+            <Search className="w-16 h-16 text-gray-400 dark:text-slate-500 mx-auto mb-4" />
+            <p className="text-gray-400 dark:text-slate-400 text-lg mb-4">No documents found matching "{searchQuery}"</p>
+            <button
+              onClick={() => setSearchQuery('')}
+              className="px-6 py-3 bg-slate-600 text-white rounded-lg font-semibold hover:bg-slate-700"
+            >
+              Clear Search
+            </button>
+          </motion.div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {documents.map((doc, idx) => (
+            {filteredDocuments.map((doc, idx) => (
               <Link key={doc.document_id} to={`/track/${doc.document_id}`}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
